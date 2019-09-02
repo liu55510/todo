@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="main.resource.mapper.UserMapper">
+    <select id="selectStudent" resultType="hashMap">
+            select * from user;
+    </select>
+    <select id="queryUser" resultType="hashMap" parameterType="String">
+            select * from user where username=#{username} AND password=#{password};
+    </select>
+    <!--查找用户-->
+    <select id="selectUser" resultType="hashMap" parameterType="test.entity.User">
+            select * from user where username=#{username};
+    </select>
+    <!--增加用户-->
+    <insert id="insertUser" parameterType="test.entity.User">
+        insert into user(Id,username,password)
+        values (#{id},#{username},#{password})
+    </insert>
+    <!--更新数据-->
+    <update id="updateUser" parameterType="test.entity.User">
+        update user set password=#{password}
+        where username=#{username}
+    </update>
+    <!--删除数据-->
+    <delete id="deleteUser" parameterType="test.entity.User">
+        delete from user where username=#{username}
+    </delete>
+    <!--批量增加用户-->
+    <insert id="batchInsertUser" parameterType="test.entity.User">
+        insert into user(Id,username,password) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},#{item.username},#{item.password})
+        </foreach>
+    </insert>
+</mapper>

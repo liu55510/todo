@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DeptOfficeMapper">
+    <!--普通映射-->
+    <resultMap id="departmentResultMap" type="test.entity.Department">
+        <id property="id" column="dept_id"/>
+        <result property="name" column="dept_name"/>
+        <result property="addr" column="dept_addr"/>
+        <result property="type" column="dept_type"/>
+    </resultMap>
+    <select id="selectdepartment" parameterType="test.entity.Department" resultType="hashMap" resultMap="departmentResultMap">
+        select * from depterment
+        where dept_name=#{name}
+    </select>
+
+    <!--使用association进行嵌套查询-->
+    <resultMap id="deptNestAssoResultMap" type="test.entity.Office">
+        <id property="id" column="office_id"></id>
+        <result property="name" column="office_name"></result>
+        <result property="deptId" column="dept_id"></result>
+        <association property="department"
+                     javaType="test.entity.Department"
+                     resultMap="deptNestedResultMap">
+
+        </association>
+    </resultMap>
+    <!--独立的resultMap-->
+    <resultMap id="deptNestedResultMap" type="test.entity.Department">
+        <id property="id" column="dept_id"/>
+        <result property="name" column="dept_name"/>
+        <result property="addr" column="dept_addr"/>
+        <result property="type" column="dept_type"/>
+    </resultMap>
+    <select id="deptNestResult" parameterType="test.entity.Office" resultMap="deptNestAssoResultMap" resultType="hashMap">
+        select * from office o,depterment d
+        where o.dept_id = d.dept_id
+    </select>
+
+    <!--使用collection进行嵌套查询-->
+    <resultMap id="deptNestCollectionResultMap" type="test.entity.Department">
+        <id property="id" column="dept_id"/>
+        <result property="name" column="dept_name"/>
+        <result property="addr" column="dept_addr"/>
+        <result property="type" column="dept_type"/>
+        <collection property="offices"
+                    ofType="test.entity.Office"
+                    resultMap="deptNestAssoResultMap">
+
+        </collection>
+    </resultMap>
+    <select id="deptNestCollectionResult" parameterType="test.entity.Department" resultMap="deptNestCollectionResultMap" resultType="hashMap">
+        select * from office o,depterment d
+        where o.dept_id = d.dept_id
+    </select>
+    <!--通过使子查询嵌套单参数-->
+    <resultMap id="subQuerySingleResultMap" type="test.entity.Department">
+        <id property="id" column="dept_id"/>
+        <result property="name" column="dept_name"/>
+        <result property="addr" column="dept_addr"/>
+        <result property="type" column="dept_type"/>
+        <collection property="offices"
+                    ofType="test.entity.Office"
+                    column="dept_id"
+                    select="selectOffice">
+
+        </collection>
+    </resultMap>
+    <!--通过子查询嵌套多参数-->
+    <resultMap id="subQueryResultMap" type="test.entity.Department">
+        <id property="id" column="dept_id"/>
+        <result property="name" column="dept_name"/>
+        <result property="addr" column="dept_addr"/>
+        <result property="type" column="dept_type"/>
+        <collection property="offices"
+                    ofType="test.entity.Office"
+                    column="{name=dept_name,id=dept_id}"
+                    select="selectOfficeMulti">
+
+        </collection>
+    </resultMap>
+    <select id="selectDepartment" resultMap="subQueryResultMap" resultType="test.entity.Department">
+        select * from depterment where dept_name=#{name}
+    </select>
+    <select id="selectOffice" resultMap="deptNestAssoResultMap" parameterType="String">
+        select * from office where dept_id=#{id}
+    </select>
+    <select id="selectOfficeMulti" resultMap="deptNestAssoResultMap">
+        SELECT * FROM office WHERE dept_id=#{id} AND dept_name=#{name}
+    </select>
+
+</mapper>

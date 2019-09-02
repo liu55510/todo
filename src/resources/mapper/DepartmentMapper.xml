@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="test.dao.DepartmentDao">
+    <resultMap type="test.entity.Department" id="departmentResultMap">
+        <id column="DEPT_ID" property="id"/>
+        <result column="DEPT_NAME" property="name"/>
+        <result column="DEPT_ADDR" property="addr"/>
+        <result column="DEPT_TYPE" property="type"/>
+    </resultMap>
+    <select id="queryDepartment" parameterType="test.entity.Department" resultMap="departmentResultMap">
+        select * from depterment where dept_name=#{name} and dept_id=#{id}
+    </select>
+    <!--多参-->
+    <select id="queryDepartmentMultiParams" resultType="test.entity.Department" resultMap="departmentResultMap">
+        select * from depterment where dept_name=#{name} and dept_id=#{id}
+    </select>
+    <!--if动态sql-->
+    <select id="dynamicIfSqlQueryDepartment" parameterType="test.entity.Department" resultMap="departmentResultMap">
+        select * from depterment where 1=1
+        <if test="name!=null">
+            and dept_name=#{name}
+        </if>
+        <if test="id!=null">
+            and dept_id=#{id}
+        </if>
+    </select>
+    <!--when动态sql-->
+    <select id="dynamicChooseSqlQueryDepartment" parameterType="test.entity.Department" resultMap="departmentResultMap">
+        select * from depterment where 1=1
+        <choose>
+            <when test="name!=null">
+                and dept_name=#{name}
+            </when>
+            <when test="id!=null">
+                and dept_id=#{id}
+            </when>
+            <otherwise>
+                and 2=2
+            </otherwise>
+        </choose>
+    </select>
+    <!--where标签选择语句-->
+    <select id="dynamicWhereSqlQueryDepartment" parameterType="test.entity.Department" resultMap="departmentResultMap">
+        select * from depterment
+        <where>
+            <if test="name!=null">
+                and dept_name=#{name}
+            </if>
+            <if test="id!=null">
+                and dept_id=#{id}
+            </if>
+        </where>
+    </select>
+    <!--trim标签选择语句-->
+    <select id="dynamicTrimWhereSqlQueryDepartment" parameterType="test.entity.Department" resultMap="departmentResultMap">
+        select * from depterment
+        <trim prefix="where" prefixOverrides="and|or">
+            <if test="name!=null">
+                and dept_name=#{name}
+            </if>
+            <if test="id!=null">
+                and dept_id=#{id}
+            </if>
+        </trim>
+    </select>
+    <!--foreach动态sql-->
+    <select id="dynamicForeachSqlQueryDepartment" parameterType="ArrayList" resultMap="departmentResultMap">
+        select * from depterment where dept_id in
+        <foreach collection="list"
+                 open="("
+                 close=")"
+                 index="index"
+                 item="item"
+                 separator=","
+                 >
+              #{item}
+        </foreach>
+    </select>
+    <!--set标签的动态sql-->
+    <update id="dynamicSetSqlUpdateDepartment" parameterType="test.entity.Department">
+        update depterment
+        <set>
+            <if test="addr!=null">
+                dept_addr=#{addr},
+            </if>
+            <if test="type!=null">
+                dept_type=#{type},
+            </if>
+        </set>
+        where dept_id=#{id}
+    </update>
+    <!--trim标签的动态sql-->
+    <update id="dynamicTrimSqlUpdateDepartment" parameterType="test.entity.Department">
+        <trim prefix="update depterment set"
+              suffix="where dept_id=#{id}"
+              suffixOverrides=","
+        >
+            <if test="addr!=null">
+                dept_addr=#{addr},
+            </if>
+            <if test="type!=null">
+                dept_type=#{type},
+            </if>
+        </trim>
+    </update>
+</mapper>
